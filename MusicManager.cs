@@ -24,7 +24,12 @@ namespace MusicLyrics
         public static async Task<GlobalSystemMediaTransportControlsSessionMediaProperties> GetMediaProperties()
         {
             GlobalSystemMediaTransportControlsSessionManager sessions = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
-            return await sessions.GetCurrentSession().TryGetMediaPropertiesAsync();
+            var currentSesseion = sessions.GetCurrentSession();
+            if (currentSesseion == null)
+            {
+                return null;
+            }
+            return await currentSesseion.TryGetMediaPropertiesAsync();
         }
 
         public static async Task<string> GetMusicLyrics(GlobalSystemMediaTransportControlsSessionMediaProperties properties)

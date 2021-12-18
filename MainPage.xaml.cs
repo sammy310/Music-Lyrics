@@ -36,6 +36,7 @@ namespace MusicLyrics
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var mediaProperties = await MusicManager.GetMediaProperties();
+            if (mediaProperties == null) return;
 
             BitmapImage image = new BitmapImage();
             await image.SetSourceAsync(await mediaProperties.Thumbnail.OpenReadAsync());
