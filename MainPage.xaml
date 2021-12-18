@@ -1,0 +1,32 @@
+﻿<Page
+    x:Class="MusicLyrics.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MusicLyrics"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer>
+        <StackPanel>
+            <Grid>
+                <Image x:Name="thumbnail" Margin="10,10,0,0" HorizontalAlignment="Left" Width="256" Height="256" VerticalAlignment="Top"/>
+                <StackPanel Margin="280,20,10,0" Height="200" VerticalAlignment="Top" Orientation="Vertical">
+                    <TextBlock x:Name="titleText" Text="TItle" TextWrapping="Wrap" FontSize="24" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>
+                    <TextBlock x:Name="artistText" Text="Artist" TextWrapping="Wrap" FontSize="20" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>
+                </StackPanel>
+                <Button Content="Get Music Info" Margin="280,234,0,0" VerticalAlignment="Top" Click="Button_Click"/>
+                <!--<ScrollViewer HorizontalAlignment="Left" Margin="10,293,0,10" Width="600">
+                <TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" IsTextSelectionEnabled="True" FontSize="20"/>
+            </ScrollViewer>-->
+
+            </Grid>
+            <!--<TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" Margin="15,293,15,10" IsTextSelectionEnabled="True" FontSize="20"/>-->
+            <!--<Grid>-->
+                <TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" Margin="15,15,15,17" IsTextSelectionEnabled="True" FontSize="20"/>
+
+            <!--</Grid>-->
+        </StackPanel>
+    </ScrollViewer>
+</Page>
