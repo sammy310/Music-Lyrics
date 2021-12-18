@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Sites>
+  <Site name="utamap">
+    <URL size="2">https://www.utamap.com/searchkasi.php?searchname={1}&amp;word={0}</URL>
+    <SearchOption>
+      <Option1>Title:title|Artist:artist</Option1>
+    </SearchOption>
+    <Select>
+      <XPath>/html/body/table[3]/tr/td/table[1]/tr/td/a</XPath>
+      <Type type="Attribute">href</Type>
+      <Site>
+        <URL size="1">https://www.utamap.com/{0}</URL>
+        <Select>
+          <XPath>/html/body/div/div/table[2]/tr/td/table[3]/tr/td/table/tr[4]/td</XPath>
+          <Type type="InnerHtml"></Type>
+          <Replace value="\n">&lt;br&gt;</Replace>
+          <Remove>&lt;!-- 歌詞 end --&gt;</Remove>
+        </Select>
+      </Site>
+    </Select>
+  </Site>
+  <Site name="J-Lyric">
+    <URL size="2">https://search2.j-lyric.net/index.php?ops={1}&amp;kt={0}</URL>
+    <SearchOption>
+      <Option1>Title:1|Artist:2</Option1>
+    </SearchOption>
+    <Select>
+      <XPath>//*[@id=&quot;mnb&quot;]/div[2]/p[1]/a</XPath>
+      <Type type="Attribute">href</Type>
+      <Site>
+        <URL size="1">{0}</URL>
+        <Select>
+          <XPath>//*[@id=&quot;Lyric&quot;]</XPath>
+          <Type type="InnerHtml"></Type>
+          <Replace value="\n">&lt;br&gt;</Replace>
+        </Select>
+      </Site>
+    </Select>
+  </Site>
+</Sites>

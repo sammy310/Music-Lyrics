@@ -12,21 +12,23 @@
         <StackPanel>
             <Grid>
                 <Image x:Name="thumbnail" Margin="10,10,0,0" HorizontalAlignment="Left" Width="256" Height="256" VerticalAlignment="Top"/>
-                <StackPanel Margin="280,20,10,0" Height="200" VerticalAlignment="Top" Orientation="Vertical">
-                    <TextBlock x:Name="titleText" Text="TItle" TextWrapping="Wrap" FontSize="24" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>
-                    <TextBlock x:Name="artistText" Text="Artist" TextWrapping="Wrap" FontSize="20" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>
-                </StackPanel>
-                <Button Content="Get Music Info" Margin="280,234,0,0" VerticalAlignment="Top" Click="Button_Click"/>
-                <!--<ScrollViewer HorizontalAlignment="Left" Margin="10,293,0,10" Width="600">
-                <TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" IsTextSelectionEnabled="True" FontSize="20"/>
-            </ScrollViewer>-->
 
+                <RelativePanel Margin="280,10,10,10">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock x:Name="titleText" Text="TItle" TextWrapping="Wrap" FontSize="24" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>
+                        <TextBlock x:Name="artistText" Text="Artist" TextWrapping="Wrap" FontSize="20" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" RelativePanel.AlignBottomWithPanel="True">
+                        <ComboBox x:Name="LyricsSite" Header="Lyrics Site" ItemsSource="{x:Bind LyricsSites}" Width="120" Margin="5" SelectionChanged="LyricsSite_SelectionChanged" SelectedIndex="0"/>
+
+                        <Button Content="Get Music Info" Click="Button_Click" Margin="5" VerticalAlignment="Bottom"/>
+                    </StackPanel>
+                </RelativePanel>
             </Grid>
-            <!--<TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" Margin="15,293,15,10" IsTextSelectionEnabled="True" FontSize="20"/>-->
-            <!--<Grid>-->
-                <TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" Margin="15,15,15,17" IsTextSelectionEnabled="True" FontSize="20"/>
 
-            <!--</Grid>-->
+            <TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" Margin="15,15,15,17" IsTextSelectionEnabled="True" FontSize="20"/>
+
         </StackPanel>
     </ScrollViewer>
 </Page>

@@ -24,11 +24,20 @@ namespace MusicLyrics
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        public List<string> LyricsSites { get; } = new List<string>()
+        {
+            "utamap",
+        };
+
+        private int currentSelectSiteIndex = 0;
+        public SiteData CurrentSelectSite => MusicManager.Instance.GetSiteData(currentSelectSiteIndex);
+
+
         public MainPage()
         {
             this.InitializeComponent();
 
-            Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(650, 720));
+            Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(680, 720));
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
         }
@@ -45,11 +54,16 @@ namespace MusicLyrics
             titleText.Text = mediaProperties.Title;
             artistText.Text = mediaProperties.Artist;
 
-            string lyrics = await MusicManager.GetMusicLyrics(mediaProperties);
+            SearchOption[] searchOptions = { SearchOption.Title };
+            string lyrics = await MusicManager.GetMusicLyrics(mediaProperties.Title, CurrentSelectSite, searchOptions);
             if (lyrics != null)
             {
                 lyricsText.Text = lyrics;
             }
+        }
+
+        private void LyricsSite_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
         }
     }
 }

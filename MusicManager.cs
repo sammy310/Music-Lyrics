@@ -9,56 +9,120 @@ using Windows.Media.Control;
 using Windows.UI.Xaml.Controls;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace MusicLyrics
 {
-    public class MusicManager
+    public enum SearchOption
     {
-        const string LyricsSite = "https://www.utamap.com/";
-        const string LyricsSearch_URL = "https://www.utamap.com/searchkasi.php?searchname={0}&word={1}";
-        const string LyricsSearch_Title = "title";
-        const string LyricsSearch_Artist = "artist";
-        const string FirstLyricsURLNode = "/html/body/table[3]/tr/td/table[1]/tr/td/a";
-        const string LyricsNode = "/html/body/div/div/table[2]/tr/td/table[3]/tr/td/table/tr[4]/td";
+        Title, Artist,
+    }
+
+    public sealed class MusicManager
+    {
+        static readonly Lazy<MusicManager> lazy = new Lazy<MusicManager>(() => new MusicManager());
+        public static MusicManager Instance { get { return lazy.Value; } }
+
+        private List<SiteData> siteDatas = null;
+
+
+        public MusicManager()
+        {
+            InitLyricsSites();
+        }
+
+        private void InitLyricsSites()
+        {
+            siteDatas = new List<SiteData>();
+
+            XmlDocument siteXml = new XmlDocument();
+            siteXml.Load(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("MusicLyrics.LyricsSite.xml"));
+            
+            XmlNode sitesNode = siteXml.SelectSingleNode("Sites");
+            foreach (XmlNode site in sitesNode.SelectNodes("Site"))
+            {
+                siteDatas.Add(new SiteData(site));
+            }
+        }
+
+        public SiteData GetSiteData(int index)
+        {
+            return siteDatas[index];
+        }
 
         public static async Task<GlobalSystemMediaTransportControlsSessionMediaProperties> GetMediaProperties()
         {
             GlobalSystemMediaTransportControlsSessionManager sessions = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
-            var currentSesseion = sessions.GetCurrentSession();
-            if (currentSesseion == null)
-            {
-                return null;
-            }
-            return await currentSesseion.TryGetMediaPropertiesAsync();
+            GlobalSystemMediaTransportControlsSession currentSesseion = sessions.GetCurrentSession();
+            return currentSesseion == null ? null : await currentSesseion.TryGetMediaPropertiesAsync();
         }
 
-        public static async Task<string> GetMusicLyrics(GlobalSystemMediaTransportControlsSessionMediaProperties properties)
+        public static async Task<string> GetMusicLyrics(string searchValue, SiteData siteData, SearchOption[] searchOptions)
         {
-            string url = string.Format(LyricsSearch_URL, LyricsSearch_Title, properties.Title);
+            string url;
+
+            // Set URL
+            if (siteData.SearchOptionSize > 0)
+            {
+                List<string> args = new List<string>();
+                args.Add(searchValue);
+                for (int i = 0; i < searchOptions.Length; i++)
+                {
+                    args.Add(siteData.GetSearchOption(i, searchOptions[i]));
+                }
+                url = string.Format(siteData.URL, args.ToArray());
+            }
+            else
+            {
+                url = string.Format(siteData.URL, searchValue);
+            }
             HtmlDocument document = await GetHtml(url);
 
-            var lyricsURLNode = document.DocumentNode.SelectSingleNode(FirstLyricsURLNode);
-            if (lyricsURLNode != null)
+            // Select XPath
+            HtmlNode selectNode = document.DocumentNode.SelectSingleNode(siteData.XPath);
+            if (selectNode != null)
             {
-                string lyricsURL = lyricsURLNode.GetAttributeValue("href", string.Empty);
-                if (lyricsURL.Length > 0)
+                // Select
+                string selectStr = string.Empty;
+                if (siteData.SelectType == SiteData.SelectTypes.Attribute)
                 {
-                    lyricsURL = LyricsSite + lyricsURL;
-                    HtmlDocument lyricsDocument = await GetHtml(lyricsURL);
+                    selectStr = selectNode.GetAttributeValue(siteData.SelectValue, string.Empty).Trim();
+                }
+                else if (siteData.SelectType == SiteData.SelectTypes.InnerHtml)
+                {
+                    selectStr = selectNode.InnerHtml.Trim();
+                }
 
-                    var lyricsNode = lyricsDocument.DocumentNode.SelectSingleNode(LyricsNode);
-                    if (lyricsNode != null)
+                if (selectStr.Length > 0)
+                {
+                    // Replace
+                    if (siteData.HasReplace)
                     {
-                        Regex pattern = new Regex("<br>");
-                        string lyrics = pattern.Replace(lyricsNode.InnerHtml, "\n");
-                        return lyrics.Remove(lyrics.LastIndexOf("<!-- 歌詞 end -->")).Trim();
+                        Regex pattern = new Regex(siteData.ReplaceRegex);
+                        selectStr = pattern.Replace(selectStr, siteData.ReplaceValue).Trim();
+                    }
+
+                    // Remove
+                    if (siteData.HasRemove)
+                    {
+                        selectStr = selectStr.Remove(selectStr.IndexOf(siteData.RemoveValue)).Trim();
+                    }
+
+                    // Return or Move Next Site
+                    if (siteData.HasNextSite)
+                    {
+                        return await GetMusicLyrics(selectStr, siteData.NextSite, null);
+                    }
+                    else
+                    {
+                        return selectStr;
                     }
                 }
             }
             return null;
         }
 
-        static async Task<HtmlDocument> GetHtml(string url)
+        private static async Task<HtmlDocument> GetHtml(string url)
         {
             using (HttpClient client = new HttpClient())
             {
