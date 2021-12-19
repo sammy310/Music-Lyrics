@@ -14,7 +14,7 @@ using System.Web;
 
 namespace MusicLyrics
 {
-    public enum SearchOption
+    public enum SearchTypes
     {
         Title, Artist,
     }
@@ -58,18 +58,18 @@ namespace MusicLyrics
             return currentSesseion == null ? null : await currentSesseion.TryGetMediaPropertiesAsync();
         }
 
-        public static async Task<string> GetMusicLyrics(string searchValue, SiteData siteData, SearchOption[] searchOptions)
+        public static async Task<string> GetMusicLyrics(string searchValue, SiteData siteData, SearchTypes[] searchTypes)
         {
             string url;
 
             // Set URL
-            if (siteData.SearchOptionSize > 0)
+            if (siteData.SearchTypeSize > 0)
             {
                 List<string> args = new List<string>();
                 args.Add(searchValue);
-                for (int i = 0; i < searchOptions.Length; i++)
+                for (int i = 0; i < searchTypes.Length; i++)
                 {
-                    args.Add(siteData.GetSearchOption(i, searchOptions[i]));
+                    args.Add(siteData.GetSearchValue(i, searchTypes[i]));
                 }
                 url = string.Format(siteData.URL, args.ToArray());
             }

@@ -22,8 +22,8 @@ namespace MusicLyrics
         public string URL { get; private set; }
         public int URLFormattingSize { get; private set; }
 
-        public int SearchOptionSize => URLFormattingSize - 1;
-        private List<List<Tuple<SearchOption, string>>> searchOptions = null;
+        public int SearchTypeSize => URLFormattingSize - 1;
+        private List<List<Tuple<SearchTypes, string>>> searchTypes = null;
 
         public string XPath { get; private set; }
 
@@ -49,30 +49,30 @@ namespace MusicLyrics
             URL = urlNode.InnerText;
             URLFormattingSize = int.Parse(urlNode.Attributes["size"].Value);
 
-            if (SearchOptionSize > 0)
+            if (SearchTypeSize > 0)
             {
-                searchOptions = new List<List<Tuple<SearchOption, string>>>();
+                searchTypes = new List<List<Tuple<SearchTypes, string>>>();
 
                 XmlNode searchNode = node.SelectSingleNode("SearchOption");
                 for (int i = 1; i < URLFormattingSize; i++)
                 {
-                    searchOptions.Add(new List<Tuple<SearchOption, string>>());
+                    searchTypes.Add(new List<Tuple<SearchTypes, string>>());
 
                     XmlNode sNode = searchNode.SelectSingleNode("Option" + i);
                     foreach (string option in sNode.InnerText.Split('|'))
                     {
                         string[] opt = option.Split(':');
-                        SearchOption searchOption = SearchOption.Title;
+                        SearchTypes searchType = SearchTypes.Title;
                         switch(opt[0])
                         {
                             case "Title":
-                                searchOption = SearchOption.Title;
+                                searchType = SearchTypes.Title;
                                 break;
                             case "Artist":
-                                searchOption = SearchOption.Artist;
+                                searchType = SearchTypes.Artist;
                                 break;
                         }
-                        searchOptions[searchOptions.Count - 1].Add(new Tuple<SearchOption, string>(searchOption, opt[1]));
+                        searchTypes[searchTypes.Count - 1].Add(new Tuple<SearchTypes, string>(searchType, opt[1]));
                     }
                 }
             }
@@ -114,16 +114,16 @@ namespace MusicLyrics
         }
 
 
-        public List<Tuple<SearchOption, string>> GetSearchOptions(int index)
+        public List<Tuple<SearchTypes, string>> GetSearchTypes(int index)
         {
-            return searchOptions[index];
+            return searchTypes[index];
         }
 
-        public string GetSearchOption(int index, SearchOption searchOption)
+        public string GetSearchValue(int index, SearchTypes searchType)
         {
-            foreach (Tuple<SearchOption, string> option in searchOptions[index])
+            foreach (Tuple<SearchTypes, string> option in searchTypes[index])
             {
-                if (option.Item1 == searchOption) return option.Item2;
+                if (option.Item1 == searchType) return option.Item2;
             }
             return null;
         }

@@ -27,8 +27,10 @@ namespace MusicLyrics
     {
         public List<string> LyricsSites { get; private set; } = new List<string>();
 
-        private int currentSelectSiteIndex => LyricsSite.SelectedIndex;
+        private int currentSelectSiteIndex => comboBoxLyricsSite.SelectedIndex;
         public SiteData CurrentSelectSite => MusicManager.Instance.GetSiteData(currentSelectSiteIndex);
+
+        public List<SearchTypes> SearchOptions { get; } = new List<SearchTypes>(Enum.GetValues(typeof(SearchTypes)).Cast<SearchTypes>());
 
 
         public MainPage()
@@ -73,20 +75,23 @@ namespace MusicLyrics
 
         private void GetMusicLyricsWithSearchOption()
         {
-            if (titleTextBox.Text.Length > 0)
+            SearchTypes searchType = (SearchTypes)comboBoxSearchType.SelectedValue;
+            string searchValue = string.Empty;
+            if(searchType == SearchTypes.Title)
             {
-                GetMusicLyrics(SearchOption.Title, titleTextBox.Text);
+                if (titleTextBox.Text.Length > 0) searchValue = titleTextBox.Text;
             }
-            else if (artistTextBox.Text.Length > 0)
+            else if (searchType == SearchTypes.Artist)
             {
-                GetMusicLyrics(SearchOption.Artist, artistTextBox.Text);
+                if (artistTextBox.Text.Length > 0) searchValue = artistTextBox.Text;
             }
+            GetMusicLyrics(searchType, searchValue);
         }
 
-        private async void GetMusicLyrics(SearchOption searchOption, string searchValue)
+        private async void GetMusicLyrics(SearchTypes searchType, string searchValue)
         {
-            SearchOption[] searchOptions = { searchOption };
-            string lyrics = await MusicManager.GetMusicLyrics(searchValue, CurrentSelectSite, searchOptions);
+            SearchTypes[] searchTypes = { searchType };
+            string lyrics = await MusicManager.GetMusicLyrics(searchValue, CurrentSelectSite, searchTypes);
             lyricsText.Text = lyrics ?? "No results found";
         }
 
@@ -94,8 +99,8 @@ namespace MusicLyrics
         {
             if (await GetMusicInfo() == false) return;
 
-            SearchOption[] searchOptions = { SearchOption.Title };
-            string lyrics = await MusicManager.GetMusicLyrics(titleText.Text, CurrentSelectSite, searchOptions);
+            SearchTypes[] searchTypes = { MusicLyrics.SearchTypes.Title };
+            string lyrics = await MusicManager.GetMusicLyrics(titleText.Text, CurrentSelectSite, searchTypes);
             if (lyrics != null)
             {
                 lyricsText.Text = lyrics;
@@ -112,10 +117,6 @@ namespace MusicLyrics
             GetMusicLyricsWithSearchOption();
         }
 
-        private void LyricsSite_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-        }
-
         private void SearchPanelBack_Click(object sender, RoutedEventArgs e)
         {
             toggleSearchOption.IsOn = !toggleSearchOption.IsOn;
@@ -124,6 +125,11 @@ namespace MusicLyrics
         private void SplitView_PaneClosed(SplitView sender, object args)
         {
             toggleSearchOption.IsOn = false;
+        }
+
+        private void ComboBoxSearchType_Loaded(object sender, RoutedEventArgs e)
+        {
+            comboBoxSearchType.SelectedItem = 0;
         }
     }
 }
