@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -24,12 +25,9 @@ namespace MusicLyrics
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        public List<string> LyricsSites { get; } = new List<string>()
-        {
-            "utamap",
-        };
+        public List<string> LyricsSites { get; private set; } = new List<string>();
 
-        private int currentSelectSiteIndex = 0;
+        private int currentSelectSiteIndex => LyricsSite.SelectedIndex;
         public SiteData CurrentSelectSite => MusicManager.Instance.GetSiteData(currentSelectSiteIndex);
 
 
@@ -40,30 +38,92 @@ namespace MusicLyrics
             Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().SetPreferredMinSize(new Size(680, 720));
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
+            SetLyricsSites();
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private void SetLyricsSites()
+        {
+            foreach (SiteData data in MusicManager.Instance.SiteDatas)
+            {
+                LyricsSites.Add(data.Name);
+            }
+        }
+
+        private async Task<bool> GetMusicInfo()
         {
             var mediaProperties = await MusicManager.GetMediaProperties();
-            if (mediaProperties == null) return;
+            if (mediaProperties == null) return false;
 
-            BitmapImage image = new BitmapImage();
-            await image.SetSourceAsync(await mediaProperties.Thumbnail.OpenReadAsync());
-            thumbnail.Source = image;
+            if (mediaProperties.Thumbnail != null)
+            {
+                BitmapImage image = new BitmapImage();
+                await image.SetSourceAsync(await mediaProperties.Thumbnail.OpenReadAsync());
+                thumbnail.Source = image;
+            }
 
             titleText.Text = mediaProperties.Title;
             artistText.Text = mediaProperties.Artist;
 
+            titleTextBox.Text = mediaProperties.Title;
+            artistTextBox.Text = mediaProperties.Artist;
+
+            return true;
+        }
+
+        private void GetMusicLyricsWithSearchOption()
+        {
+            if (titleTextBox.Text.Length > 0)
+            {
+                GetMusicLyrics(SearchOption.Title, titleTextBox.Text);
+            }
+            else if (artistTextBox.Text.Length > 0)
+            {
+                GetMusicLyrics(SearchOption.Artist, artistTextBox.Text);
+            }
+        }
+
+        private async void GetMusicLyrics(SearchOption searchOption, string searchValue)
+        {
+            SearchOption[] searchOptions = { searchOption };
+            string lyrics = await MusicManager.GetMusicLyrics(searchValue, CurrentSelectSite, searchOptions);
+            lyricsText.Text = lyrics ?? "No results found";
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (await GetMusicInfo() == false) return;
+
             SearchOption[] searchOptions = { SearchOption.Title };
-            string lyrics = await MusicManager.GetMusicLyrics(mediaProperties.Title, CurrentSelectSite, searchOptions);
+            string lyrics = await MusicManager.GetMusicLyrics(titleText.Text, CurrentSelectSite, searchOptions);
             if (lyrics != null)
             {
                 lyricsText.Text = lyrics;
             }
         }
 
+        private async void GetMusicInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (await GetMusicInfo() == false) return;
+        }
+
+        private void GetMusicLyricsButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetMusicLyricsWithSearchOption();
+        }
+
         private void LyricsSite_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+        }
+
+        private void SearchPanelBack_Click(object sender, RoutedEventArgs e)
+        {
+            toggleSearchOption.IsOn = !toggleSearchOption.IsOn;
+        }
+
+        private void SplitView_PaneClosed(SplitView sender, object args)
+        {
+            toggleSearchOption.IsOn = false;
         }
     }
 }

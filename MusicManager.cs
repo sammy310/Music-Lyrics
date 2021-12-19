@@ -10,6 +10,7 @@ using Windows.UI.Xaml.Controls;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Web;
 
 namespace MusicLyrics
 {
@@ -23,7 +24,7 @@ namespace MusicLyrics
         static readonly Lazy<MusicManager> lazy = new Lazy<MusicManager>(() => new MusicManager());
         public static MusicManager Instance { get { return lazy.Value; } }
 
-        private List<SiteData> siteDatas = null;
+        public List<SiteData> SiteDatas { get; private set; } = null;
 
 
         public MusicManager()
@@ -33,7 +34,7 @@ namespace MusicLyrics
 
         private void InitLyricsSites()
         {
-            siteDatas = new List<SiteData>();
+            SiteDatas = new List<SiteData>();
 
             XmlDocument siteXml = new XmlDocument();
             siteXml.Load(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("MusicLyrics.LyricsSite.xml"));
@@ -41,13 +42,13 @@ namespace MusicLyrics
             XmlNode sitesNode = siteXml.SelectSingleNode("Sites");
             foreach (XmlNode site in sitesNode.SelectNodes("Site"))
             {
-                siteDatas.Add(new SiteData(site));
+                SiteDatas.Add(new SiteData(site));
             }
         }
 
         public SiteData GetSiteData(int index)
         {
-            return siteDatas[index];
+            return SiteDatas[index];
         }
 
         public static async Task<GlobalSystemMediaTransportControlsSessionMediaProperties> GetMediaProperties()
@@ -107,6 +108,9 @@ namespace MusicLyrics
                     {
                         selectStr = selectStr.Remove(selectStr.IndexOf(siteData.RemoveValue)).Trim();
                     }
+
+                    // Html Decode
+                    selectStr = HttpUtility.HtmlDecode(selectStr);
 
                     // Return or Move Next Site
                     if (siteData.HasNextSite)
