@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="MusicLyrics.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MusicLyrics"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <ScrollViewer Padding="56,0,0,0" IsTabStop="False" UseSystemFocusVisuals="False" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
+            <StackPanel HorizontalAlignment="Left">
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,0" Text="Lyrics Font" />
+                <StackPanel Margin="0,10,0,0">
+                    <ComboBox x:Name="comboFontSize" IsEditable="True" ItemsSource="{x:Bind FontSizes}" Header="Font Size" Width="200" Loaded="ComboFontSize_Loaded" TextSubmitted="ComboFontSize_TextSubmitted" SelectionChanged="ComboFontSize_SelectionChanged" />
+                    <TextBlock x:Name="testText"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

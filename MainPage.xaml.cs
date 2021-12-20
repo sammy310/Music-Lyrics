@@ -131,5 +131,10 @@ namespace MusicLyrics
         {
             comboBoxSearchType.SelectedItem = 0;
         }
+
+        private void LyricsText_Loaded(object sender, RoutedEventArgs e)
+        {
+            lyricsText.FontSize = SettingsHelper.LyricsFontSize;
+        }
     }
 }

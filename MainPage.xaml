@@ -28,7 +28,7 @@
                     </RelativePanel>
                 </Grid>
 
-                <TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" Margin="15,15,15,17" IsTextSelectionEnabled="True" FontSize="20"/>
+                <TextBlock x:Name="lyricsText" Text="Lyrics" TextWrapping="Wrap" Margin="15,15,15,17" IsTextSelectionEnabled="True" Loaded="LyricsText_Loaded"/>
 
             </StackPanel>
 

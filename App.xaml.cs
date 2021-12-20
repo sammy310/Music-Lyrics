@@ -41,6 +41,8 @@ namespace MusicLyrics
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
+            SettingsHelper.Initialize();
+
             // 창에 콘텐츠가 이미 있는 경우 앱 초기화를 반복하지 말고,
             // 창이 활성화되어 있는지 확인하십시오.
             if (rootFrame == null)
@@ -66,7 +68,7 @@ namespace MusicLyrics
                     // 탐색 스택이 복원되지 않으면 첫 번째 페이지로 돌아가고
                     // 필요한 정보를 탐색 매개 변수로 전달하여 새 페이지를
                     // 구성합니다.
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    rootFrame.Navigate(typeof(SettingsPage), e.Arguments);
                 }
                 // 현재 창이 활성 창인지 확인
                 Window.Current.Activate();
