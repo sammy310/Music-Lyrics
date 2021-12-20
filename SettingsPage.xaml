@@ -14,7 +14,6 @@
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,0" Text="Lyrics Font" />
                 <StackPanel Margin="0,10,0,0">
                     <ComboBox x:Name="comboFontSize" IsEditable="True" ItemsSource="{x:Bind FontSizes}" Header="Font Size" Width="200" Loaded="ComboFontSize_Loaded" TextSubmitted="ComboFontSize_TextSubmitted" SelectionChanged="ComboFontSize_SelectionChanged" />
-                    <TextBlock x:Name="testText"></TextBlock>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
