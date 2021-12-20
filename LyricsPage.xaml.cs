@@ -13,17 +13,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
-
-
-// 빈 페이지 항목 템플릿에 대한 설명은 https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x412에 나와 있습니다.
 
 namespace MusicLyrics
 {
-    /// <summary>
-    /// 자체적으로 사용하거나 프레임 내에서 탐색할 수 있는 빈 페이지입니다.
-    /// </summary>
-    public sealed partial class MainPage : Page
+    public sealed partial class LyricsPage : Page
     {
         public List<string> LyricsSites { get; private set; } = new List<string>();
 
@@ -33,7 +26,7 @@ namespace MusicLyrics
         public List<SearchTypes> SearchOptions { get; } = new List<SearchTypes>(Enum.GetValues(typeof(SearchTypes)).Cast<SearchTypes>());
 
 
-        public MainPage()
+        public LyricsPage()
         {
             this.InitializeComponent();
 
