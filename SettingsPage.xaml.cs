@@ -78,7 +78,18 @@ namespace MusicLyrics
             if (isDouble)
             {
                 SettingsHelper.LyricsFontSize = fontSize;
+                textFontSizeExample.FontSize = fontSize;
             }
+        }
+
+        private void ToggleLyricsOnStart_Loaded(object sender, RoutedEventArgs e)
+        {
+            toggleLyricsOnStart.IsOn = SettingsHelper.IsGetLyricsOnStart;
+        }
+
+        private void ToggleLyricsOnStart_Toggled(object sender, RoutedEventArgs e)
+        {
+            SettingsHelper.IsGetLyricsOnStart = toggleLyricsOnStart.IsOn;
         }
     }
 }

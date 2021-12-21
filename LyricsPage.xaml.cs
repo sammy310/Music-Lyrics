@@ -26,6 +26,8 @@ namespace MusicLyrics
         public List<SearchTypes> SearchOptions { get; } = new List<SearchTypes>(Enum.GetValues(typeof(SearchTypes)).Cast<SearchTypes>());
 
 
+        private static bool IsFirstStart { get; set; } = true;
+
         private static string TItleText { get; set; } = null;
         private static string ArtistText { get; set; } = null;
         private static BitmapImage Thumbnail { get; set; } = null;
@@ -58,30 +60,45 @@ namespace MusicLyrics
 
         private void Initialize()
         {
-            if (TItleText != null)
+            if (!IsFirstStart)
             {
-                titleText.Text = TItleText;
-            }
-            if (ArtistText != null)
-            {
-                artistText.Text = ArtistText;
-            }
-            if (Thumbnail != null)
-            {
-                thumbnail.Source = Thumbnail;
-            }
-            if (LyricsText != null)
-            {
-                lyricsText.Text = LyricsText;
-            }
+                if (TItleText != null)
+                {
+                    titleText.Text = TItleText;
+                }
+                if (ArtistText != null)
+                {
+                    artistText.Text = ArtistText;
+                }
+                if (Thumbnail != null)
+                {
+                    thumbnail.Source = Thumbnail;
+                }
+                if (LyricsText != null)
+                {
+                    lyricsText.Text = LyricsText;
+                }
 
-            if (SearchTitleText != null)
-            {
-                searchTitleTextBox.Text = SearchTitleText;
+                if (SearchTitleText != null)
+                {
+                    searchTitleTextBox.Text = SearchTitleText;
+                }
+                if (SearchArtistText != null)
+                {
+                    searchArtistTextBox.Text = SearchArtistText;
+                }
             }
-            if (SearchArtistText != null)
+        }
+        
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (IsFirstStart)
             {
-                searchArtistTextBox.Text = SearchArtistText;
+                IsFirstStart = false;
+                if (SettingsHelper.IsGetLyricsOnStart)
+                {
+                    GetAllDefaultInfo();
+                }
             }
         }
 
@@ -147,13 +164,15 @@ namespace MusicLyrics
             }
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void GetAllDefaultInfo()
         {
             if (await GetMusicInfo() == false) return;
+            GetMusicLyrics(SearchTypes.Title, titleText.Text);
+        }
 
-            SearchTypes[] searchTypes = { MusicLyrics.SearchTypes.Title };
-            string lyrics = await MusicManager.GetMusicLyrics(titleText.Text, CurrentSelectSite, searchTypes);
-            SetLyricsText(lyrics);
+        private void GetAllInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+            GetAllDefaultInfo();
         }
 
         private async void GetMusicInfoButton_Click(object sender, RoutedEventArgs e)
