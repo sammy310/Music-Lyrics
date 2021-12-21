@@ -10,7 +10,7 @@
     Loaded="Page_Loaded">
 
     <ScrollViewer>
-        <SplitView DisplayMode="Overlay" PanePlacement="Right" IsPaneOpen="{x:Bind toggleSearchOption.IsOn, Mode=OneWay}" PaneClosed="SplitView_PaneClosed">
+        <SplitView DisplayMode="Overlay" PanePlacement="Right" IsPaneOpen="{x:Bind toggleSearchOption.IsOn, Mode=OneWay}" PaneClosed="SplitView_PaneClosed" IsTabStop="False">
             <StackPanel>
                 <Grid>
                     <Image x:Name="thumbnail" Margin="10,10,0,0" HorizontalAlignment="Left" Width="256" Height="256" VerticalAlignment="Top"/>
