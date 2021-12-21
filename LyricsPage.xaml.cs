@@ -147,6 +147,8 @@ namespace MusicLyrics
 
         private async void GetMusicLyrics(SearchTypes searchType, string searchValue)
         {
+            lyricsText.Text = "Searching...";
+
             SearchTypes[] searchTypes = { searchType };
             string lyrics = await MusicManager.GetMusicLyrics(searchValue, CurrentSelectSite, searchTypes);
             SetLyricsText(lyrics);
