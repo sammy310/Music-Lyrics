@@ -44,8 +44,8 @@
                         </Grid>
 
                         <StackPanel Orientation="Vertical" Margin="10">
-                            <TextBox x:Name="searchTitleTextBox" Header="Title" PlaceholderText="Title" Margin="0,0,0,10"/>
-                            <TextBox x:Name="searchArtistTextBox" Header="Artist" PlaceholderText="Artist" Margin="0,0,0,10"/>
+                            <TextBox x:Name="searchTitleTextBox" Header="Title" PlaceholderText="Title" Margin="0,0,0,10" TextChanged="SearchTitleTextBox_TextChanged" />
+                            <TextBox x:Name="searchArtistTextBox" Header="Artist" PlaceholderText="Artist" Margin="0,0,0,10" TextChanged="SearchArtistTextBox_TextChanged" />
 
                             <ComboBox x:Name="comboBoxSearchType" Header="Search Type" ItemsSource="{x:Bind SearchOptions}" Margin="0,10,0,10" SelectedIndex="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
                             

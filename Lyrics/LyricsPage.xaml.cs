@@ -196,5 +196,15 @@ namespace MusicLyrics
         {
             toggleSearchOption.IsOn = false;
         }
+
+        private void SearchTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchTitleText = searchTitleTextBox.Text;
+        }
+
+        private void SearchArtistTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchArtistText = searchArtistTextBox.Text;
+        }
     }
 }
