@@ -96,7 +96,10 @@ namespace MusicLyrics
                         foreach (XPathProperty property in siteData.Property.Properties)
                         {
                             string propertyValue = SelectXPath(selectNode, property);
-                            musicData.AddProperty(property.Name, propertyValue);
+                            if (propertyValue != null)
+                            {
+                                musicData.AddProperty(property.Name, propertyValue);
+                            }
                         }
                         if (siteData.HasNextSite)
                         {
@@ -140,6 +143,8 @@ namespace MusicLyrics
         private string SelectXPath(HtmlNode node, XPathProperty property)
         {
             HtmlNode selectNode = node.SelectSingleNode(property.XPath);
+            if (selectNode == null) return null;
+
             string selectStr = string.Empty;
             switch (property.XPathSelectType)
             {

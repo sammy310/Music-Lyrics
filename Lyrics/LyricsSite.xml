@@ -35,9 +35,9 @@
     </Search>
   </Site>
   <Site name="J-Lyric">
-    <URL size="2">https://search2.j-lyric.net/index.php?ops={1}&amp;kt={0}</URL>
+    <URL size="2">https://search2.j-lyric.net/index.php?{1}={0}</URL>
     <SearchOption>
-      <Option1>Title:1|Artist:2</Option1>
+      <Option1>Title:kt|Artist:ka</Option1>
     </SearchOption>
     <Search>
       <XPath>//*[@id=&quot;mnb&quot;]/div[@class=&quot;bdy&quot;]</XPath>
