@@ -13,7 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-namespace MusicLyrics
+namespace MusicLyrics.Lyrics
 {
     public sealed partial class LyricsSelectPage : Page
     {

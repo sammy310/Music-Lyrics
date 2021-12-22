@@ -14,7 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace MusicLyrics
+namespace MusicLyrics.Lyrics
 {
     public sealed partial class LyricsPage : Page
     {
@@ -28,10 +28,9 @@ namespace MusicLyrics
 
         private static bool IsFirstStart { get; set; } = true;
 
-        private static string TItleText { get; set; } = null;
-        private static string ArtistText { get; set; } = null;
+        private static LyricsData CurrentLyricsData { get; set; } = new LyricsData();
+
         private static BitmapImage Thumbnail { get; set; } = null;
-        private static string LyricsText { get; set; } = null;
 
         private static string SearchTitleText { get; set; } = null;
         private static string SearchArtistText { get; set; } = null;
@@ -62,21 +61,16 @@ namespace MusicLyrics
         {
             if (!IsFirstStart)
             {
-                if (TItleText != null)
+                if (CurrentLyricsData != null)
                 {
-                    titleText.Text = TItleText;
+                    titleText.Text = CurrentLyricsData.Title;
+                    artistText.Text = CurrentLyricsData.Artist;
+                    lyricsText.Text = CurrentLyricsData.Lyrics;
                 }
-                if (ArtistText != null)
-                {
-                    artistText.Text = ArtistText;
-                }
+
                 if (Thumbnail != null)
                 {
                     thumbnail.Source = Thumbnail;
-                }
-                if (LyricsText != null)
-                {
-                    lyricsText.Text = LyricsText;
                 }
 
                 if (SearchTitleText != null)
@@ -121,8 +115,8 @@ namespace MusicLyrics
                 Thumbnail = image;
             }
 
-            TItleText = titleText.Text = mediaProperties.Title;
-            ArtistText = artistText.Text = mediaProperties.Artist;
+            SetTitleText(mediaProperties.Title);
+            SetArtistText(mediaProperties.Artist);
 
             SearchTitleText = searchTitleTextBox.Text = mediaProperties.Title;
             SearchArtistText = searchArtistTextBox.Text = mediaProperties.Artist;
@@ -142,23 +136,38 @@ namespace MusicLyrics
             {
                 if (searchArtistTextBox.Text.Length > 0) searchValue = searchArtistTextBox.Text;
             }
-            GetMusicLyrics(searchType, searchValue, false);
+            GetMusicLyrics(searchType, searchValue, true);
         }
 
-        private async void GetMusicLyrics(SearchTypes searchType, string searchValue, bool justGetFirst)
+        private async void GetMusicLyrics(SearchTypes searchType, string searchValue, bool isSelectLyrics)
         {
             lyricsText.Text = "Searching...";
 
             SearchTypes[] searchTypes = { searchType };
-            string lyrics = await MusicManager.Instance.GetMusicLyrics(searchValue, CurrentSelectSite, searchTypes, justGetFirst);
-            SetLyricsText(lyrics);
+            LyricsData lyricData = await MusicManager.Instance.GetMusicLyrics(null, searchValue, CurrentSelectSite, searchTypes, !isSelectLyrics);
+            SetLyricsData(lyricData, !isSelectLyrics);
         }
 
-        private void SetLyricsText(string newLyrics)
+        private void SetTitleText(string newText)
         {
-            if (newLyrics != null)
+            CurrentLyricsData.Title = titleText.Text = newText;
+        }
+
+        private void SetArtistText(string newText)
+        {
+            CurrentLyricsData.Artist = artistText.Text = newText;
+        }
+
+        private void SetLyricsData(LyricsData newLyricsData, bool onlyChangeLyrics)
+        {
+            if (newLyricsData != null)
             {
-                LyricsText = lyricsText.Text = newLyrics;
+                if (!onlyChangeLyrics)
+                {
+                    SetTitleText(newLyricsData.Title);
+                    SetArtistText(newLyricsData.Artist);
+                }
+                CurrentLyricsData.Lyrics = lyricsText.Text = newLyricsData.Lyrics;
             }
             else
             {
@@ -169,7 +178,7 @@ namespace MusicLyrics
         private async void GetAllDefaultInfo()
         {
             if (await GetMusicInfo() == false) return;
-            GetMusicLyrics(SearchTypes.Title, titleText.Text, true);
+            GetMusicLyrics(SearchTypes.Title, titleText.Text, false);
         }
 
         private void GetAllInfoButton_Click(object sender, RoutedEventArgs e)

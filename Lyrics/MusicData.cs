@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicLyrics
+namespace MusicLyrics.Lyrics
 {
     public class MusicData
     {

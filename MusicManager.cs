@@ -11,6 +11,7 @@ using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Web;
+using MusicLyrics.Lyrics;
 
 namespace MusicLyrics
 {
@@ -58,7 +59,7 @@ namespace MusicLyrics
             return currentSesseion == null ? null : await currentSesseion.TryGetMediaPropertiesAsync();
         }
 
-        public async Task<string> GetMusicLyrics(string searchValue, SiteData siteData, SearchTypes[] searchTypes, bool justGetFirst)
+        public async Task<LyricsData> GetMusicLyrics(LyricsData lyricsData, string searchValue, SiteData siteData, SearchTypes[] searchTypes, bool justGetFirst)
         {
             string url;
 
@@ -108,7 +109,11 @@ namespace MusicLyrics
                         musicDatas.Add(musicData);
                     }
 
-                    return await SelectLyricsFromUser(musicDatas, justGetFirst);
+                    MusicData selectMusicData = await SelectLyricsFromUser(musicDatas, justGetFirst);
+                    if (selectMusicData != null)
+                    {
+                        return await GetMusicLyrics(selectMusicData);
+                    }
                 }
             }
             else if (siteData.XPathType == XPathTypes.Select)
@@ -116,15 +121,18 @@ namespace MusicLyrics
                 HtmlNode selectNode = document.DocumentNode.SelectSingleNode(siteData.XPath);
                 if (selectNode != null)
                 {
-                    return SelectXPath(selectNode, siteData.Property);
+                    string lyrics = SelectXPath(selectNode, siteData.Property);
+                    LyricsData returnData = new LyricsData(lyricsData);
+                    returnData.Lyrics = lyrics;
+                    return returnData;
                 }
             }
             return null;
         }
 
-        public async Task<string> GetMusicLyrics(MusicData musicData)
+        public async Task<LyricsData> GetMusicLyrics(MusicData musicData)
         {
-            return await GetMusicLyrics(musicData.URL, musicData.TargetSiteData, null, true);
+            return await GetMusicLyrics(new LyricsData(musicData.Title, musicData.Artist), musicData.URL, musicData.TargetSiteData, null, true);
         }
 
         private async Task<HtmlDocument> GetHtml(string url)
@@ -185,7 +193,7 @@ namespace MusicLyrics
             return selectStr;
         }
 
-        private async Task<string> SelectLyricsFromUser(List<MusicData> musicDatas, bool justGetFirst)
+        private async Task<MusicData> SelectLyricsFromUser(List<MusicData> musicDatas, bool justGetFirst)
         {
             int selectIndex = 0;
             if (musicDatas.Count > 1 && justGetFirst == false)
@@ -208,7 +216,7 @@ namespace MusicLyrics
                     return null;
                 }
             }
-            return await GetMusicLyrics(musicDatas[selectIndex]);
+            return musicDatas[selectIndex];
         }
     }
 }
