@@ -18,7 +18,7 @@ namespace MusicLyrics
 {
     public sealed partial class LyricsPage : Page
     {
-        public List<string> LyricsSites { get; private set; } = new List<string>();
+        public List<string> LyricsSites { get; } = new List<string>();
 
         private int currentSelectSiteIndex => comboBoxSearchSite.SelectedIndex;
         public SiteData CurrentSelectSite => MusicManager.Instance.GetSiteData(currentSelectSiteIndex);
@@ -110,7 +110,7 @@ namespace MusicLyrics
 
         private async Task<bool> GetMusicInfo()
         {
-            var mediaProperties = await MusicManager.GetMediaProperties();
+            var mediaProperties = await MusicManager.Instance.GetMediaProperties();
             if (mediaProperties == null) return false;
 
             if (mediaProperties.Thumbnail != null)
@@ -142,15 +142,15 @@ namespace MusicLyrics
             {
                 if (searchArtistTextBox.Text.Length > 0) searchValue = searchArtistTextBox.Text;
             }
-            GetMusicLyrics(searchType, searchValue);
+            GetMusicLyrics(searchType, searchValue, false);
         }
 
-        private async void GetMusicLyrics(SearchTypes searchType, string searchValue)
+        private async void GetMusicLyrics(SearchTypes searchType, string searchValue, bool justGetFirst)
         {
             lyricsText.Text = "Searching...";
 
             SearchTypes[] searchTypes = { searchType };
-            string lyrics = await MusicManager.GetMusicLyrics(searchValue, CurrentSelectSite, searchTypes);
+            string lyrics = await MusicManager.Instance.GetMusicLyrics(searchValue, CurrentSelectSite, searchTypes, justGetFirst);
             SetLyricsText(lyrics);
         }
 
@@ -169,7 +169,7 @@ namespace MusicLyrics
         private async void GetAllDefaultInfo()
         {
             if (await GetMusicInfo() == false) return;
-            GetMusicLyrics(SearchTypes.Title, titleText.Text);
+            GetMusicLyrics(SearchTypes.Title, titleText.Text, true);
         }
 
         private void GetAllInfoButton_Click(object sender, RoutedEventArgs e)

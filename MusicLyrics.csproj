@@ -119,9 +119,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LyricsPage.xaml.cs">
+    <Compile Include="Lyrics\LyricsPage.xaml.cs">
       <DependentUpon>LyricsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Lyrics\LyricsSelectPage.xaml.cs">
+      <DependentUpon>LyricsSelectPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Lyrics\MusicData.cs" />
     <Compile Include="MusicManager.cs" />
     <Compile Include="Navigation\NavigationItemData.cs" />
     <Compile Include="Navigation\NavigationPage.xaml.cs">
@@ -132,7 +136,7 @@
     <Compile Include="SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SiteData.cs" />
+    <Compile Include="Lyrics\SiteData.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -140,7 +144,7 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="LyricsSite.xml" />
+    <EmbeddedResource Include="Lyrics\LyricsSite.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -155,9 +159,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="LyricsPage.xaml">
+    <Page Include="Lyrics\LyricsPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Lyrics\LyricsSelectPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Navigation\NavigationPage.xaml">
       <SubType>Designer</SubType>

@@ -37,7 +37,7 @@ namespace MusicLyrics
             SiteDatas = new List<SiteData>();
 
             XmlDocument siteXml = new XmlDocument();
-            siteXml.Load(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("MusicLyrics.LyricsSite.xml"));
+            siteXml.Load(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("MusicLyrics.Lyrics.LyricsSite.xml"));
             
             XmlNode sitesNode = siteXml.SelectSingleNode("Sites");
             foreach (XmlNode site in sitesNode.SelectNodes("Site"))
@@ -51,14 +51,14 @@ namespace MusicLyrics
             return SiteDatas[index];
         }
 
-        public static async Task<GlobalSystemMediaTransportControlsSessionMediaProperties> GetMediaProperties()
+        public async Task<GlobalSystemMediaTransportControlsSessionMediaProperties> GetMediaProperties()
         {
             GlobalSystemMediaTransportControlsSessionManager sessions = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
             GlobalSystemMediaTransportControlsSession currentSesseion = sessions.GetCurrentSession();
             return currentSesseion == null ? null : await currentSesseion.TryGetMediaPropertiesAsync();
         }
 
-        public static async Task<string> GetMusicLyrics(string searchValue, SiteData siteData, SearchTypes[] searchTypes)
+        public async Task<string> GetMusicLyrics(string searchValue, SiteData siteData, SearchTypes[] searchTypes, bool justGetFirst)
         {
             string url;
 
@@ -78,55 +78,53 @@ namespace MusicLyrics
                 url = string.Format(siteData.URL, searchValue);
             }
             HtmlDocument document = await GetHtml(url);
-
-            // Select XPath
-            HtmlNode selectNode = document.DocumentNode.SelectSingleNode(siteData.XPath);
-            if (selectNode != null)
+            if (document == null)
             {
-                // Select
-                string selectStr = string.Empty;
-                if (siteData.SelectType == SiteData.SelectTypes.Attribute)
+                return null;
+            }
+
+
+            if (siteData.XPathType == XPathTypes.Search)
+            {
+                HtmlNodeCollection selectNodes = document.DocumentNode.SelectNodes(siteData.XPath);
+                if (selectNodes != null)
                 {
-                    selectStr = selectNode.GetAttributeValue(siteData.SelectValue, string.Empty).Trim();
+                    List<MusicData> musicDatas = new List<MusicData>();
+                    foreach (HtmlNode selectNode in selectNodes)
+                    {
+                        MusicData musicData = new MusicData();
+                        foreach (XPathProperty property in siteData.Property.Properties)
+                        {
+                            string propertyValue = SelectXPath(selectNode, property);
+                            musicData.AddProperty(property.Name, propertyValue);
+                        }
+                        if (siteData.HasNextSite)
+                        {
+                            musicData.SetTargetSiteData(siteData.NextSite);
+                        }
+                        musicDatas.Add(musicData);
+                    }
+
+                    return await SelectLyricsFromUser(musicDatas, justGetFirst);
                 }
-                else if (siteData.SelectType == SiteData.SelectTypes.InnerHtml)
+            }
+            else if (siteData.XPathType == XPathTypes.Select)
+            {
+                HtmlNode selectNode = document.DocumentNode.SelectSingleNode(siteData.XPath);
+                if (selectNode != null)
                 {
-                    selectStr = selectNode.InnerHtml.Trim();
-                }
-
-                if (selectStr.Length > 0)
-                {
-                    // Replace
-                    if (siteData.HasReplace)
-                    {
-                        Regex pattern = new Regex(siteData.ReplaceRegex);
-                        selectStr = pattern.Replace(selectStr, siteData.ReplaceValue).Trim();
-                    }
-
-                    // Remove
-                    if (siteData.HasRemove)
-                    {
-                        selectStr = selectStr.Remove(selectStr.IndexOf(siteData.RemoveValue)).Trim();
-                    }
-
-                    // Html Decode
-                    selectStr = HttpUtility.HtmlDecode(selectStr);
-
-                    // Return or Move Next Site
-                    if (siteData.HasNextSite)
-                    {
-                        return await GetMusicLyrics(selectStr, siteData.NextSite, null);
-                    }
-                    else
-                    {
-                        return selectStr;
-                    }
+                    return SelectXPath(selectNode, siteData.Property);
                 }
             }
             return null;
         }
 
-        private static async Task<HtmlDocument> GetHtml(string url)
+        public async Task<string> GetMusicLyrics(MusicData musicData)
+        {
+            return await GetMusicLyrics(musicData.URL, musicData.TargetSiteData, null, true);
+        }
+
+        private async Task<HtmlDocument> GetHtml(string url)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -135,9 +133,77 @@ namespace MusicLyrics
 
                 HtmlDocument document = new HtmlDocument();
                 document.LoadHtml(await content.ReadAsStringAsync());
-
                 return document;
             }
+        }
+
+        private string SelectXPath(HtmlNode node, XPathProperty property)
+        {
+            HtmlNode selectNode = node.SelectSingleNode(property.XPath);
+            string selectStr = string.Empty;
+            switch (property.XPathSelectType)
+            {
+                case XPathSelectTypes.Attribute:
+                    selectStr = selectNode.GetAttributeValue(property.XPathSelectValue, string.Empty).Trim();
+                    break;
+                case XPathSelectTypes.InnerHtml:
+                    selectStr = selectNode.InnerHtml.Trim();
+                    break;
+                case XPathSelectTypes.InnerText:
+                    selectStr = selectNode.InnerText.Trim();
+                    break;
+            }
+
+            if (selectStr.Length > 0)
+            {
+                // Replace
+                if (property.HasReplace)
+                {
+                    Regex pattern = new Regex(property.ReplaceRegex);
+                    selectStr = pattern.Replace(selectStr, property.ReplaceValue).Trim();
+                }
+
+                // Remove
+                if (property.HasRemove)
+                {
+                    int index = selectStr.IndexOf(property.RemoveValue);
+                    if (index != -1)
+                    {
+                        selectStr = selectStr.Remove(index, property.RemoveValue.Length).Trim();
+                    }
+                }
+
+                // Html Decode
+                selectStr = HttpUtility.HtmlDecode(selectStr);
+            }
+
+            return selectStr;
+        }
+
+        private async Task<string> SelectLyricsFromUser(List<MusicData> musicDatas, bool justGetFirst)
+        {
+            int selectIndex = 0;
+            if (musicDatas.Count > 1 && justGetFirst == false)
+            {
+                ContentDialog dialog = new ContentDialog();
+                dialog.Title = "Select Lyrics";
+                dialog.PrimaryButtonText = "Select";
+                dialog.CloseButtonText = "Cancel";
+                dialog.DefaultButton = ContentDialogButton.Primary;
+                LyricsSelectPage selectPage = new LyricsSelectPage(musicDatas);
+                dialog.Content = selectPage;
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    selectIndex = Math.Max(0, selectPage.SelectedIndex);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return await GetMusicLyrics(musicDatas[selectIndex]);
         }
     }
 }
