@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ namespace MusicLyrics
         private const string LyricsFontSizeKey = "LyricsFontSize";
         public const double DefaultFontSize = 20;
 
+        private const string LyricsSitesDataPathKey = "LyricsSitesDataPath";
+
         public static void Initialize()
         {
             object isGetLyricsOnStartValue = ApplicationData.Current.LocalSettings.Values[IsGetLyricsOnStartKey];
@@ -26,6 +29,16 @@ namespace MusicLyrics
             if (lyricsFontSizeValue != null)
             {
                 lyricsFontSize = (double)lyricsFontSizeValue;
+            }
+
+            object lyricsSitesDataPath = ApplicationData.Current.LocalSettings.Values[LyricsSitesDataPathKey];
+            if (lyricsSitesDataPath != null)
+            {
+                lyricsSitesDataFilePath = (string)lyricsSitesDataPath;
+            }
+            else
+            {
+                InitLyricsSitesDataFile();
             }
         }
 
@@ -54,6 +67,40 @@ namespace MusicLyrics
                     lyricsFontSize = value;
                     ApplicationData.Current.LocalSettings.Values[LyricsFontSizeKey] = lyricsFontSize;
                 }
+            }
+        }
+
+
+        // Lyrics Sites Data
+
+        public const string DefaultLyricsSitesDataFileName = "LyricsSite.xml";
+        private static string lyricsSitesDataFilePath = DefaultLyricsSitesDataFileName;
+        public static string LyricsSitesDataFilePath
+        {
+            get => lyricsSitesDataFilePath;
+            set
+            {
+                if (value != null)
+                {
+                    if (MusicManager.Instance.InitLyricsSites(value))
+                    {
+                        lyricsSitesDataFilePath = value;
+                        ApplicationData.Current.LocalSettings.Values[LyricsSitesDataPathKey] = lyricsSitesDataFilePath;
+                    }
+                }
+            }
+        }
+
+        public static void InitLyricsSitesDataFile()
+        {
+            using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("MusicLyrics.Lyrics.LyricsSite.xml"))
+            {
+                string path = ApplicationData.Current.LocalFolder.Path + "\\" + DefaultLyricsSitesDataFileName;
+                using (var file = new FileStream(path, FileMode.Create, FileAccess.Write))
+                {
+                    stream.CopyTo(file);
+                }
+                LyricsSitesDataFilePath = path;
             }
         }
     }

@@ -12,8 +12,14 @@
         <ScrollViewer Padding="56,0,0,0" IsTabStop="False" UseSystemFocusVisuals="False" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
             <StackPanel HorizontalAlignment="Left">
                 <TextBlock Style="{StaticResource TitleTextBlockStyle}" Margin="0,12,0,0" Text="Lyrics" />
-                <ToggleSwitch x:Name="toggleLyricsOnStart" Header="Get music lyrics on Start" Loaded="ToggleLyricsOnStart_Loaded" Toggled="ToggleLyricsOnStart_Toggled" />
+                <StackPanel Margin="0,10,0,0">
+                    <ToggleSwitch x:Name="toggleLyricsOnStart" Header="Get music lyrics on Start" Loaded="ToggleLyricsOnStart_Loaded" Toggled="ToggleLyricsOnStart_Toggled" />
 
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="textBoxLyricsSitesData" Header="Lyrics sites data" MinWidth="200" Width="Auto" Margin="0,5,0,0" Loaded="TextBoxLyricsSitesData_Loaded" IsReadOnly="True" />
+                        <!--<Button Content="Select" Margin="10,0,0,0" VerticalAlignment="Bottom" Click="ButtonLyricsSitesData_Click" />-->
+                    </StackPanel>
+                </StackPanel>
 
                 <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,0" Text="Font" />
                 <StackPanel Margin="0,10,0,0">

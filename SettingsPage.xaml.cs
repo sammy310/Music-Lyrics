@@ -12,6 +12,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 
 namespace MusicLyrics
 {
@@ -90,6 +92,43 @@ namespace MusicLyrics
         private void ToggleLyricsOnStart_Toggled(object sender, RoutedEventArgs e)
         {
             SettingsHelper.IsGetLyricsOnStart = toggleLyricsOnStart.IsOn;
+        }
+
+
+        // Lyrics Sites
+
+        //private async void ButtonLyricsSitesData_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var picker = new FileOpenPicker();
+        //    picker.ViewMode = PickerViewMode.List;
+        //    picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+        //    picker.FileTypeFilter.Add(".xml");
+
+        //    StorageFile file = await picker.PickSingleFileAsync();
+        //    if (file != null)
+        //    {
+        //        textBoxLyricsSitesData.Text = file.Name;
+        //        SettingsHelper.LyricsSitesDataFilePath = file.Path;
+        //        if (SettingsHelper.LyricsSitesDataFilePath.CompareTo(file.Path) == 0)
+        //        {
+        //            //textBoxLyricsSitesData.Text = file.Name;
+        //            textBoxLyricsSitesData.Text = file.Path;
+        //        }
+        //        // Wrong file
+        //        else
+        //        {
+        //            var dialog = new ContentDialog();
+        //            dialog.CloseButtonText = "OK";
+        //            dialog.DefaultButton = ContentDialogButton.Close;
+        //            dialog.Title = "File data incorrect!!";
+        //            await dialog.ShowAsync();
+        //        }
+        //    }
+        //}
+
+        private void TextBoxLyricsSitesData_Loaded(object sender, RoutedEventArgs e)
+        {
+            textBoxLyricsSitesData.Text = SettingsHelper.LyricsSitesDataFilePath;
         }
     }
 }

@@ -25,26 +25,70 @@ namespace MusicLyrics
         static readonly Lazy<MusicManager> lazy = new Lazy<MusicManager>(() => new MusicManager());
         public static MusicManager Instance { get { return lazy.Value; } }
 
-        public List<SiteData> SiteDatas { get; private set; } = null;
+        public List<SiteData> SiteDatas { get; private set; } = new List<SiteData>();
 
 
         public MusicManager()
         {
-            InitLyricsSites();
+            if (InitLyricsSites(SettingsHelper.LyricsSitesDataFilePath) == false)
+            {
+                InitDefaultLyricsSites();
+            }
         }
 
-        private void InitLyricsSites()
+        private XmlDocument GetXmlDocument(string fileName, bool isURL)
         {
-            SiteDatas = new List<SiteData>();
-
-            XmlDocument siteXml = new XmlDocument();
-            siteXml.Load(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("MusicLyrics.Lyrics.LyricsSite.xml"));
-            
-            XmlNode sitesNode = siteXml.SelectSingleNode("Sites");
-            foreach (XmlNode site in sitesNode.SelectNodes("Site"))
+            try
             {
-                SiteDatas.Add(new SiteData(site));
+                XmlDocument siteXml = new XmlDocument();
+                if (isURL)
+                {
+                    XmlReader reader = XmlReader.Create(fileName);
+                    siteXml.Load(reader);
+                }
+                else
+                {
+                    siteXml.Load(fileName);
+                }
+                return siteXml;
             }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private void InitDefaultLyricsSites()
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.Load(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("MusicLyrics.Lyrics.LyricsSite.xml"));
+
+            InitLyricsSites(xmlDocument);
+        }
+        
+        private void InitLyricsSites(XmlDocument xmlDocument)
+        {
+            XmlNode sitesNode = xmlDocument.SelectSingleNode("Sites");
+            if (sitesNode != null)
+            {
+                SiteDatas.Clear();
+                foreach (XmlNode site in sitesNode.SelectNodes("Site"))
+                {
+                    SiteData data = new SiteData(site);
+                    if (data.IsValidData)
+                        SiteDatas.Add(data);
+                }
+            }
+        }
+
+        public bool InitLyricsSites(string filename, bool isURL = false)
+        {
+            XmlDocument xmlDocument = GetXmlDocument(filename, isURL);
+            if (xmlDocument != null)
+            {
+                InitLyricsSites(xmlDocument);
+            }
+            return xmlDocument != null;
         }
 
         public SiteData GetSiteData(int index)

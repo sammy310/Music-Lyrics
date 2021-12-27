@@ -95,6 +95,8 @@ namespace MusicLyrics
 
     public class SiteData
     {
+        public bool IsValidData { get; private set; } = true;
+
         public bool IsRootSite => Name != null;
 
         public string Name { get; private set; }
@@ -121,8 +123,16 @@ namespace MusicLyrics
             Name = node.Attributes["name"]?.Value ?? null;
 
             XmlNode urlNode = node.SelectSingleNode("URL");
-            URL = urlNode.InnerText;
-            URLFormattingSize = int.Parse(urlNode.Attributes["size"].Value);
+            if (urlNode != null)
+            {
+                URL = urlNode.InnerText;
+                URLFormattingSize = int.Parse(urlNode.Attributes["size"].Value);
+            }
+            else
+            {
+                IsValidData = false;
+                return;
+            }
 
             if (SearchTypeSize > 0)
             {
