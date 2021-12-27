@@ -14,12 +14,18 @@ namespace MusicLyrics.Lyrics
 
         public string Lyrics { get; set; }
 
-        public LyricsData() { }
+        public LyricsData()
+        {
+            Title = string.Empty;
+            Artist = string.Empty;
+            Lyrics = string.Empty;
+        }
 
         public LyricsData(string title, string artist)
         {
             Title = title;
             Artist = artist;
+            Lyrics = string.Empty;
         }
 
         public LyricsData(string title, string artist, string lyrics)

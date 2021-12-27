@@ -13,9 +13,14 @@
         <SplitView DisplayMode="Overlay" PanePlacement="Right" IsPaneOpen="{x:Bind toggleSearchOption.IsOn, Mode=OneWay}" PaneClosed="SplitView_PaneClosed" IsTabStop="False">
             <StackPanel>
                 <Grid>
-                    <Image x:Name="thumbnail" Margin="10,10,0,0" HorizontalAlignment="Left" Width="256" Height="256" VerticalAlignment="Top"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Image x:Name="thumbnail" Grid.Column="0" Margin="10,10,0,0" HorizontalAlignment="Left" Width="Auto" Height="256" VerticalAlignment="Top"/>
 
-                    <RelativePanel Margin="280,10,10,10">
+                    <RelativePanel Grid.Column="1" Margin="10">
                         <StackPanel Orientation="Vertical" Margin="0,0,0,70">
                             <TextBlock x:Name="titleText" Text="TItle" TextWrapping="Wrap" FontSize="24" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>
                             <TextBlock x:Name="artistText" Text="Artist" TextWrapping="Wrap" FontSize="20" IsTextSelectionEnabled="True" Margin="0,5,0,5"/>

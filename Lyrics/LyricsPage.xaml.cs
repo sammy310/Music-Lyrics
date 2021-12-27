@@ -30,7 +30,7 @@ namespace MusicLyrics.Lyrics
 
         private static LyricsData CurrentLyricsData { get; set; } = new LyricsData();
 
-        private static BitmapImage Thumbnail { get; set; } = null;
+        private static ImageSource Thumbnail { get; set; } = null;
 
         private static string SearchTitleText { get; set; } = null;
         private static string SearchArtistText { get; set; } = null;
@@ -63,15 +63,17 @@ namespace MusicLyrics.Lyrics
             {
                 if (CurrentLyricsData != null)
                 {
-                    titleText.Text = CurrentLyricsData.Title;
-                    artistText.Text = CurrentLyricsData.Artist;
-                    lyricsText.Text = CurrentLyricsData.Lyrics;
+                    if (CurrentLyricsData.Title.Length > 0)
+                        titleText.Text = CurrentLyricsData.Title;
+
+                    if (CurrentLyricsData.Artist.Length > 0)
+                        artistText.Text = CurrentLyricsData.Artist;
+
+                    if (CurrentLyricsData.Lyrics.Length > 0)
+                        lyricsText.Text = CurrentLyricsData.Lyrics;
                 }
 
-                if (Thumbnail != null)
-                {
-                    thumbnail.Source = Thumbnail;
-                }
+                thumbnail.Source = Thumbnail;
 
                 if (SearchTitleText != null)
                 {
