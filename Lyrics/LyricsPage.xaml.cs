@@ -44,19 +44,18 @@ namespace MusicLyrics.Lyrics
 
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
-            SetLyricsSites();
+            InitLyricsSites();
 
             Initialize();
         }
 
-        private void SetLyricsSites()
+        private void InitLyricsSites()
         {
             foreach (SiteData data in MusicManager.Instance.SiteDatas)
             {
                 LyricsSites.Add(data.Name);
             }
         }
-
         private void Initialize()
         {
             if (!IsFirstStart)
@@ -128,6 +127,8 @@ namespace MusicLyrics.Lyrics
 
         private void GetMusicLyricsWithSearchOption()
         {
+            if (comboBoxSearchType.SelectedValue == null) return;
+
             SearchTypes searchType = (SearchTypes)comboBoxSearchType.SelectedValue;
             string searchValue = string.Empty;
             if (searchType == SearchTypes.Title)
@@ -216,6 +217,31 @@ namespace MusicLyrics.Lyrics
         private void SearchArtistTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             SearchArtistText = searchArtistTextBox.Text;
+        }
+
+
+        private void CheckSearchTypes()
+        {
+            if (comboBoxSearchType.SelectedValue != null)
+            {
+                bool isExists = false;
+                SearchTypes searchType = (SearchTypes)comboBoxSearchType.SelectedValue;
+                foreach (var types in CurrentSelectSite.GetSearchTypes(0))
+                {
+                    if (types.Item1 == searchType)
+                    {
+                        isExists = true;
+                        break;
+                    }
+                }
+
+                buttonGetLyrics.IsEnabled = isExists;
+            }
+        }
+
+        private void ComboBoxSearch_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            CheckSearchTypes();
         }
     }
 }
