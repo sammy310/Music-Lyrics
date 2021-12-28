@@ -126,9 +126,27 @@ namespace MusicLyrics
         //    }
         //}
 
+        private async void ButtonLyricsSitesDataDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            string directoryPath = Path.GetDirectoryName(SettingsHelper.LyricsSitesDataFilePath);
+            string fileName = Path.GetFileName(SettingsHelper.LyricsSitesDataFilePath);
+
+            var folder = await StorageFolder.GetFolderFromPathAsync(directoryPath);
+            if (folder != null)
+            {
+                var item = await folder.GetItemAsync(fileName);
+
+                var folderLauncherOptions = new Windows.System.FolderLauncherOptions();
+                folderLauncherOptions.ItemsToSelect.Add(item);
+
+                await Windows.System.Launcher.LaunchFolderPathAsync(directoryPath, folderLauncherOptions);
+            }
+        }
+
         private void TextBoxLyricsSitesData_Loaded(object sender, RoutedEventArgs e)
         {
-            textBoxLyricsSitesData.Text = SettingsHelper.LyricsSitesDataFilePath;
+            string fileName = Path.GetFileName(SettingsHelper.LyricsSitesDataFilePath);
+            textBoxLyricsSitesData.Text = fileName;
         }
     }
 }

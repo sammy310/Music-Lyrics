@@ -18,6 +18,7 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBox x:Name="textBoxLyricsSitesData" Header="Lyrics sites data" MinWidth="200" Width="Auto" Margin="0,5,0,0" Loaded="TextBoxLyricsSitesData_Loaded" IsReadOnly="True" />
                         <!--<Button Content="Select" Margin="10,0,0,0" VerticalAlignment="Bottom" Click="ButtonLyricsSitesData_Click" />-->
+                        <Button Content="Open" Margin="10,0,0,0" VerticalAlignment="Bottom" Click="ButtonLyricsSitesDataDirectory_Click" />
                     </StackPanel>
                 </StackPanel>
 
